@@ -25,14 +25,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp
+        GameEntity.cpp \
+        Ghost.cpp \
+        Pacman.cpp \
+        Tile.cpp \
+        game.cpp \
+        main.cpp
 
 HEADERS += \
-        mainwindow.h
+    GameEntity.h \
+    Ghost.h \
+    Pacman.h \
+    Tile.h \
+    game.h
 
-FORMS += \
-        mainwindow.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
