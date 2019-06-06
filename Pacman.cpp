@@ -10,9 +10,10 @@ Pacman::Pacman(){
 
 Pacman::Pacman(Game *g): GameEntity(g){
     //initial conditins
-    speed = 0.2;
+    speed = 0.15;
     ogSpeed = speed;
-    dir = LEFT;
+    //dir = LEFT;
+    dir = RIGHT;
     for (int i  = 0; i < 4; i++)
         keyFlags[i] = 0;
 
@@ -51,6 +52,7 @@ void Pacman::update(){
                 }
                 else
                 game->GameOver();
+                return;
             }
         }
         if((int (ePos.y())) == (int (y()))){
@@ -66,6 +68,7 @@ void Pacman::update(){
                 }
                 else
                 game->GameOver();
+                return;
             }
         }
     }

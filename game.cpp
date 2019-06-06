@@ -1,6 +1,9 @@
 #include "game.h"
 #include "Pacman.h"
-#include "Ghost.h"
+#include "Blinky.h"
+#include "Pinky.h"
+#include "Clyde.h"
+#include "Inky.h"
 #include <string>
 #include <QPixmap>
 #include <QDebug>
@@ -13,10 +16,17 @@ Game::Game(){
     this->setSceneRect(0,0,560,700);
     this->setBackgroundBrush(Qt::black);
     power = false;
+    gg = false;
     points = 0;
     pallets = 0;
 
     //Game board
+    dashboard = new QGraphicsTextItem("Points: 0");
+    dashboard->setDefaultTextColor(Qt::white);
+    dashboard->setFont(QFont("Arial"));
+    dashboard->setPos(50, 25);
+    dashboard->setPlainText("Points: 0");
+    this->addItem(dashboard);
     board = new QGraphicsPixmapItem(
                 QPixmap("../2019-pd2-pacman/Pacman_Board.png").scaled(GRID_W * GRID_SCALE, GRID_H * GRID_SCALE));
     board->setPos(0,SCORE_PADDING);
@@ -88,12 +98,20 @@ Game::Game(){
     }
 
 
-    GameEntity * entity = new Pacman(this);
-    entities.push_back(entity);
+    GameEntity * pacman = new Pacman(this);
+    entities.push_back(pacman);
 
-    Ghost * g = new Ghost(this);
-    g->setPos(this->getTileXY(1,1)->pos());
-    entities.push_back(g);
+    GameEntity * b = new Blinky(this);
+    entities.push_back(b);
+
+    GameEntity * p = new Pinky(this);
+    entities.push_back(p);
+
+    GameEntity * c = new Clyde(this);
+    entities.push_back(c);
+
+    GameEntity * i = new Inky(this);
+    entities.push_back(i);
 
     for(int i = 0;  i < entities.size(); i++){
         entities.at(i)->update();
@@ -102,11 +120,19 @@ Game::Game(){
     QTimer * timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(play()));
 
+    scattert = new QTimer();
+    connect(scattert, SIGNAL(timeout()), this, SLOT(scatter()));
+
     timer->start(1);
+    scattert->start(12000);
 
 }
 
 Tile * Game::getTileXY(int x, int y){
+    if(x<0)x = 0;
+    if(x>GRID_W) x = GRID_W;
+    if(y<0)y = 0;
+    if(y>GRID_H) y = GRID_H;
     return tiles.at(y*GRID_W + x);
 }
 
@@ -115,23 +141,40 @@ void Game::addPoints(int p, bool pallet){
     if(pallet){
         pallets++;
     }
+    QString s("Points: ");
+    s.append(std::to_string(points).c_str());
+    dashboard->setPlainText(s);
 }
 
 void Game::powerPallet()
 {
+    scattert->stop();
     for(int i = 1;  i < entities.size(); i++){
         static_cast<Ghost *>(entities.at(i))->setMode(SC);
     }
     power = true;
-    QTimer::singleShot(3000, this, SLOT(normalMode()));
+    QTimer::singleShot(5000, this, SLOT(normalMode()));
 
 }
 
 void Game::GameOver()
 {
-    if(pallets == 246){
-        qDebug() << "win";
+    if(gg) return;
+    gg = true;
+    for(unsigned i = 0;  i < entities.size(); i++){
+        this->removeItem(entities.at(i));
+        entities.at(i)->changeSpeed(0);
     }
+    QGraphicsTextItem *t = new QGraphicsTextItem();
+    t->setFont(QFont("Arial"));
+    t->setPos(150, 25);
+    t->setPlainText("YOU LOOSE");
+    t->setDefaultTextColor(Qt::red);
+    if(pallets == 246){
+        t->setPlainText("YOU WIN!");
+        t->setDefaultTextColor(Qt::green);
+    }
+    this->addItem(t);
 }
 
 void Game::play(){
@@ -146,5 +189,13 @@ void Game::normalMode(){
 for(int i = 1;  i < entities.size(); i++){
     static_cast<Ghost *>(entities.at(i))->setMode(N);
 }
+scattert->start(12000);
 power = false;
+}
+
+void Game::scatter(){
+    for(int i = 1;  i < entities.size(); i++){
+        static_cast<Ghost *>(entities.at(i))->setMode(S);
+    }
+    QTimer::singleShot(3000, this, SLOT(normalMode()));
 }

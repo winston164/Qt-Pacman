@@ -12,12 +12,10 @@ Ghost::Ghost()
 Ghost::Ghost(Game *g): GameEntity (g), pathPoints(){
     speed = 0.1;
     this->setRect(-8,-8,35,35);
-    color = new QBrush(Qt::red);
     this->setBrush(*color);
     dir = RIGHT;
     mode = N;
     currentTile = QPoint(0,0);
-    basePos = pos().toPoint();
     game->addItem(this);
 }
 
@@ -25,7 +23,7 @@ void Ghost::setMode(Mode m){
     mode = m;
     if(mode == SC){
         path.clear();
-        printPath();
+        //printPath();
         this->setBrush(QBrush(Qt::blue));
         if(dir == UP) dir = DOWN;
         else
@@ -35,10 +33,10 @@ void Ghost::setMode(Mode m){
         else
         if(dir == LEFT) dir = RIGHT;
         currentTile = QPoint(0,0);
-    }else {
-        findPath();
-        printPath();
+    }else{
         this->setBrush(*color);
+        findPath();
+        //printPath();
     }
 
 
@@ -55,6 +53,7 @@ void Ghost::update(){
     if( !((int (g.x()) >= GRID_W*GRID_SCALE - 20) || int (g.x()) <= 0)
             && (int (g.x()))%GRID_SCALE == 0 && ((int (g.y())))%GRID_SCALE == 0){
         pacmanPoint = g;
+        pacmanDir = game->entities.at(0)->getDir();
     }
 
     if((int (x()))%GRID_SCALE == 0 && ((int (y())))%GRID_SCALE == 0){
@@ -71,6 +70,7 @@ void Ghost::update(){
         if(mode == S){
             destPos = basePos;
             findPath();
+            //printPath();
             followPath();
         }
         if(mode == SC){
@@ -103,7 +103,7 @@ void Ghost::update(){
 void Ghost::normalMode(){
     destPos = QPoint(int (pacmanPoint.x()), int (pacmanPoint.y()));
     findPath();
-    printPath();
+    //printPath();
     followPath();
 }
 
@@ -127,12 +127,12 @@ void Ghost::findPath(){
     std::vector<struct node *> allNodes;
     std::vector<QPoint> neighbors;
 
-    struct node * first = new struct node;
-    *first = {pos().toPoint(), 0, 0, nullptr};
-    allNodes.push_back(first);
-    priQueue.push_back(first);
+    struct node * firstN = new struct node;
+    *firstN = {currentTile, 0, 0, nullptr};
+    allNodes.push_back(firstN);
+    priQueue.push_back(firstN);
 
-
+    if(!priQueue.empty())
     while (priQueue.first()->pos != destPos) {
         //find neighbor points of the first elemnt
         struct node * first = priQueue.first();
@@ -174,20 +174,20 @@ void Ghost::findPath(){
                 priQueue.insert(auxPos, auxN);
             }
         }
+        if(priQueue.empty()) return;
         //repeat until the first element in the queue is the destination node
     }
     //at this point the first element of the queue is the destination node
     //the nodes are linked backwads so to make the path list we have to build it backwards
 
+
     struct node *nodeP = priQueue.first();
-    if(!path.empty())
     path.clear();
     while (nodeP->prev != nullptr) {
         path.push_front(nodeP->pos);
         nodeP = nodeP->prev;
     }
     for(unsigned i = 0; i < allNodes.size(); i++) delete allNodes.at(i);
-
 }
 
 //Call when inside specific tile
@@ -236,6 +236,7 @@ void Ghost::printPath(){
         game->removeItem(pathPoints.at(i));
         delete pathPoints.at(i);
     }
+    if(!pathPoints.empty())
     pathPoints.clear();
 
     QGraphicsEllipseItem *el;

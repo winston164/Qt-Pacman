@@ -11,8 +11,10 @@ public:
     virtual void move();
     virtual void update();
     void changeDir(direction);
+    direction getDir();
     void changeSpeed(double);
     virtual ~GameEntity();
+
 protected:
     Game * game;
     QBrush * color;

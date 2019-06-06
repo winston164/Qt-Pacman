@@ -25,17 +25,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        Blinky.cpp \
+        Clyde.cpp \
         GameEntity.cpp \
         Ghost.cpp \
+        Inky.cpp \
         Pacman.cpp \
+        Pinky.cpp \
         Tile.cpp \
         game.cpp \
         main.cpp
 
 HEADERS += \
+    Blinky.h \
+    Clyde.h \
     GameEntity.h \
     Ghost.h \
+    Inky.h \
     Pacman.h \
+    Pinky.h \
     Tile.h \
     game.h
 

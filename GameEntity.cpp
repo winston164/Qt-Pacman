@@ -42,6 +42,11 @@ void GameEntity::changeDir(direction d){
     dir = d;
 }
 
+direction GameEntity::getDir()
+{
+    return dir;
+}
+
 void GameEntity::changeSpeed(double s){
     speed = s;
 }

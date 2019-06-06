@@ -15,6 +15,7 @@ public:
     virtual void normalMode();
     virtual ~Ghost();
     void printPath();
+    void eaten();
 
 
 protected:
@@ -22,6 +23,7 @@ protected:
     void followPath();
     QList<QGraphicsEllipseItem *> pathPoints;
     QPoint findNeighbor(direction dir, const QPoint &p);
+    direction pacmanDir;
     QPoint destPos;
     QPoint basePos;
     QPoint currentTile;

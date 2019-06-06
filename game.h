@@ -28,10 +28,15 @@ public:
 public slots:
     void play();
     void normalMode();
+    void scatter();
 
 private:
+
     int pallets;
     int points;
+    bool gg;
+    QTimer * scattert;
+    QGraphicsTextItem * dashboard;
     std::vector<Tile *> nodes;
     std::vector<Tile *> tiles;
     //std::vector<GameEntity *> entities;
